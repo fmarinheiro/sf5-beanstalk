@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  php:
+    image: webdevops/php-apache-dev:8.0-alpine
+    working_dir: /app
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public/
+      - XDEBUG_START_WITH_REQUEST=yes
+      - XDEBUG_MODE=off
+    volumes:
+      - .:/app
+    ports:
+      - 8000:80
+    depends_on: [mariadb]
+
+  node:
+    image: node:16-alpine
+    working_dir: /app
+    user: node
+    volumes:
+      - .:/app
+    command: sh -c 'tail -f /dev/null'
+
+  mariadb:
+    image: mariadb:10.4.22
+    volumes:
+      - database:/var/lib/mysql
+      - .:/app
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: somedb
+      MYSQL_USER: someuser 
+      MYSQL_PASSWORD: somepass
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+
+volumes:
+  database:
+
